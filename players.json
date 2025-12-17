@@ -1,0 +1,6 @@
+[
+  {"id":1,"name":"Connor McDavid","accuracy":0.85,"image":"imgs/mcdavid.png"},
+  {"id":2,"name":"Auston Matthews","accuracy":0.88,"image":"imgs/matthews.png"},
+  {"id":3,"name":"Sidney Crosby","accuracy":0.82,"image":"imgs/crosby.png"},
+  {"id":4,"name":"Alex Ovechkin","accuracy":0.9,"image":"imgs/ovechkin.png"}
+]
