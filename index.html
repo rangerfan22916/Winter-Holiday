@@ -12,25 +12,22 @@
 
 <canvas id="snow"></canvas>
 
-<header class="site-header text-center">
+<header class="site-header">
   <h1>Winter Classic Shootout</h1>
-  <p>Select your player and goalie, then shoot!</p>
+  <p>Select your player and goalie, then shoot</p>
 </header>
 
-<main id="app" class="container my-4">
+<main id="app" class="main-container">
 
-  <!-- PLAYER & GOALIE SELECTION -->
-  <div class="row mb-4 text-center">
+  <!-- Player & Goalie Selection -->
+  <div class="row mb-3 text-center">
     <div class="col-md-6">
       <label>Shooter</label>
       <select class="form-select" v-model="selectedPlayerId">
         <option disabled value="">Select Shooter</option>
         <option v-for="p in players" :value="p.id">{{ p.name }}</option>
       </select>
-      <div v-if="selectedPlayer" class="selection-preview">
-        <img :src="selectedPlayer.image" class="selection-img">
-        <p>{{ selectedPlayer.name }}</p>
-      </div>
+      <img v-if="selectedPlayer" :src="selectedPlayer.image" class="selection-img">
     </div>
 
     <div class="col-md-6">
@@ -39,46 +36,56 @@
         <option disabled value="">Select Goalie</option>
         <option v-for="g in goalies" :value="g.id">{{ g.name }}</option>
       </select>
-      <div v-if="selectedGoalie" class="selection-preview">
-        <img :src="selectedGoalie.image" class="selection-img">
-        <p>{{ selectedGoalie.name }}</p>
+      <img v-if="selectedGoalie" :src="selectedGoalie.image" class="selection-img">
+    </div>
+  </div>
+
+  <!-- Difficulty -->
+  <div class="text-center mb-3">
+    <label>Difficulty</label>
+    <select class="form-select w-25 mx-auto" v-model="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+
+  <!-- Rink + Scoreboard -->
+  <div class="game-wrapper">
+
+    <!-- Rink Section -->
+    <section class="rink" @click="shoot">
+      <img src="imgs/rink.webp" class="rink-bg">
+      <img v-if="selectedPlayer" :src="selectedPlayer.image" class="player">
+      <div class="goal-wrapper">
+        <img src="imgs/goal.png" class="goal">
+        <img v-if="selectedGoalie" :src="selectedGoalie.image" class="goalie" :style="goalieStyle">
+      </div>
+      <img v-if="puckVisible" src="imgs/puck.png" class="puck" :style="puckStyle">
+    </section>
+
+    <!-- Scoreboard Section -->
+    <div class="scoreboard">
+      <div class="score-header">
+        <div class="player-info">
+          <div>PLAYER</div>
+          <img v-if="selectedPlayer" :src="selectedPlayer.image" class="score-img">
+        </div>
+        <div class="goalie-info">
+          <div>GOALIE</div>
+          <img v-if="selectedGoalie" :src="selectedGoalie.image" class="score-img">
+        </div>
+      </div>
+
+      <div class="score-body">
+        <div class="score-item">SHOTS<span>{{ shots }}</span></div>
+        <div class="score-item">GOALS<span>{{ goals }}</span></div>
+        <div class="score-item">BONUS<span>{{ bonus }}</span></div>
+        <div class="score-item">BEST<span>{{ bestScore }}</span></div>
+        <div class="score-message" v-if="message">{{ message }}</div>
       </div>
     </div>
-  </div>
 
-  <!-- DIFFICULTY -->
-  <div class="row mb-3 text-center">
-    <div class="col-md-12">
-      <label>Difficulty</label>
-      <select class="form-select w-25 mx-auto" v-model="difficulty">
-        <option value="easy">Easy</option>
-        <option value="medium">Medium</option>
-        <option value="hard">Hard</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- RINK -->
-  <section class="rink" @click="shoot">
-    <img src="imgs/rink.webp" class="rink-bg">
-
-    <!-- PLAYER ON ICE -->
-    <img v-if="selectedPlayer" :src="selectedPlayer.image" class="player">
-
-    <!-- GOAL & GOALIE -->
-    <img src="imgs/goal.png" class="goal">
-    <img v-if="selectedGoalie" :src="selectedGoalie.image" class="goalie" :style="goalieStyle">
-
-    <!-- TARGETS -->
-
-    <!-- PUCK -->
-    <img v-if="puckVisible" src="imgs/puck.png" class="puck" :style="puckStyle">
-  </section>
-
-  <!-- SCOREBOARD -->
-  <div class="scoreboard mt-3 text-center">
-    <p>Shots: {{ shots }} | Goals: {{ goals }} | Bonus: {{ bonus }} | Best: {{ bestScore }}</p>
-    <p v-if="message" class="message">{{ message }}</p>
   </div>
 
 </main>
