@@ -1,41 +1,25 @@
-/* General */
 body {
   margin: 0;
   font-family: "Arial Black", Impact, system-ui, sans-serif;
-  background: #eef2f7;
+  background: #020617;
+  color: white;
 }
 
 .site-header {
-  background: #020617;
-  color: white;
+  background: #0f172a;
+  color: #facc15;
   padding: 1.75rem;
   text-align: center;
 }
 
-.selection-img {
-  width: 120px;
-  display: block;
-  margin: 0.5rem auto;
+.form-select-lg {
+  font-size: 1.25rem;
+  padding: 0.5rem 1rem;
 }
 
-/* Main game wrapper */
-.main-container {
-  padding: 1rem;
-}
-
-.game-wrapper {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-/* Rink */
 .rink {
   position: relative;
-  width: 700px;
-  max-width: 90vw;
-  height: 480px;
+  min-height: 500px;
   border-radius: 20px;
   overflow: hidden;
   cursor: crosshair;
@@ -53,7 +37,7 @@ body {
   position: absolute;
   bottom: 20px;
   left: 50%;
-  width: 140px;
+  width: 160px;
   transform: translateX(-50%);
   z-index: 4;
 }
@@ -62,8 +46,8 @@ body {
   position: absolute;
   top: 80px;
   left: 50%;
-  width: 280px;
-  height: 170px;
+  width: 300px;
+  height: 180px;
   transform: translateX(-50%);
   z-index: 2;
 }
@@ -97,21 +81,18 @@ body {
   z-index: 5;
 }
 
-/* Scoreboard */
 .scoreboard {
   display: flex;
   flex-direction: column;
-  background: #0f172a;
-  color: white;
+  background: #1e293b;
+  color: #facc15;
   border-radius: 12px;
   padding: 1rem;
-  min-width: 220px;
+  min-width: 200px;
   font-weight: 900;
   letter-spacing: 1px;
   position: sticky;
   top: 20px;
-  height: fit-content;
-  z-index: 10;
 }
 
 .score-header {
@@ -122,18 +103,8 @@ body {
 
 .player-info,
 .goalie-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.score-img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  margin-top: 0.25rem;
-  border: 2px solid #facc15;
-  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 .score-body {
@@ -144,7 +115,7 @@ body {
 }
 
 .score-item {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 }
 
 .score-item span {
@@ -155,11 +126,27 @@ body {
 
 .score-message {
   color: #facc15;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   margin-top: 0.5rem;
 }
 
-/* Snow effect */
+/* Accuracy bar */
+.accuracy-bar {
+  background: #0f172a;
+  border-radius: 8px;
+  width: 100%;
+  height: 16px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.accuracy-fill {
+  height: 100%;
+  background: #facc15;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
 #snow {
   position: fixed;
   inset: 0;
@@ -168,21 +155,8 @@ body {
 }
 
 @media (max-width: 768px) {
-  .rink {
-    height: 360px;
-  }
-
-  .goal-wrapper {
-    width: 220px;
-    height: 135px;
-  }
-
-  .scoreboard {
-    min-width: 180px;
-  }
-
-  .score-img {
-    width: 50px;
-    height: 50px;
-  }
+  .goal-wrapper { width: 220px; height: 135px; }
+  .player { width: 120px; }
+  .scoreboard { min-width: 150px; }
+  .form-select-lg { font-size: 1rem; }
 }

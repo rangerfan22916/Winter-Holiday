@@ -20,18 +20,18 @@
 <main id="app" class="container my-4">
 
   <!-- Player & Goalie Selection -->
-  <div class="row mb-3 text-center">
+  <div class="row mb-4 text-center">
     <div class="col-md-6">
-      <label>Shooter</label>
-      <select class="form-select" v-model="selectedPlayerId">
+      <label class="form-label h5">Shooter</label>
+      <select class="form-select form-select-lg" v-model="selectedPlayerId">
         <option disabled value="">Select Shooter</option>
         <option v-for="p in players" :value="p.id">{{ p.name }}</option>
       </select>
     </div>
 
     <div class="col-md-6">
-      <label>Goalie</label>
-      <select class="form-select" v-model="selectedGoalieId">
+      <label class="form-label h5">Goalie</label>
+      <select class="form-select form-select-lg" v-model="selectedGoalieId">
         <option disabled value="">Select Goalie</option>
         <option v-for="g in goalies" :value="g.id">{{ g.name }}</option>
       </select>
@@ -39,9 +39,9 @@
   </div>
 
   <!-- Difficulty -->
-  <div class="text-center mb-3">
-    <label>Difficulty</label>
-    <select class="form-select w-25 mx-auto" v-model="difficulty">
+  <div class="text-center mb-4">
+    <label class="form-label h5">Difficulty</label>
+    <select class="form-select form-select-lg w-50 mx-auto" v-model="difficulty">
       <option value="easy">Easy</option>
       <option value="medium">Medium</option>
       <option value="hard">Hard</option>
@@ -49,11 +49,12 @@
   </div>
 
   <!-- Game Area + Scoreboard -->
-  <div class="d-flex align-start gap-3">
-    
+  <div class="d-flex align-start gap-4 flex-wrap">
+
     <!-- Rink Section -->
-    <section class="rink flex-shrink-0" @click="shoot">
+    <section class="rink flex-grow-1" @click="shoot">
       <img src="imgs/rink.webp" class="rink-bg">
+      <img v-if="selectedPlayer" :src="selectedPlayer.image" class="player">
       <div class="goal-wrapper">
         <img src="imgs/goal.png" class="goal">
         <img v-if="selectedGoalie" :src="selectedGoalie.image" class="goalie" :style="goalieStyle">
@@ -63,17 +64,11 @@
 
     <!-- Scoreboard Section -->
     <div class="scoreboard">
-      
-      <!-- Top: Player & Goalie Images -->
+
+      <!-- Header Text -->
       <div class="score-header">
-        <div class="player-info">
-          <div>PLAYER</div>
-          <img v-if="selectedPlayer" :src="selectedPlayer.image" class="score-img">
-        </div>
-        <div class="goalie-info">
-          <div>GOALIE</div>
-          <img v-if="selectedGoalie" :src="selectedGoalie.image" class="score-img">
-        </div>
+        <div class="player-info">PLAYER</div>
+        <div class="goalie-info">GOALIE</div>
       </div>
 
       <!-- Scores -->
@@ -83,11 +78,15 @@
         <div class="score-item">BONUS<span>{{ bonus }}</span></div>
         <div class="score-item">BEST<span>{{ bestScore }}</span></div>
         <div class="score-message" v-if="message">{{ message }}</div>
+
+        <!-- Accuracy bar -->
+        <div class="accuracy-bar">
+          <div class="accuracy-fill" :style="{ width: shots > 0 ? (goals/shots*100)+'%' : '0%' }"></div>
+        </div>
       </div>
 
     </div>
   </div>
-
 </main>
 
 <script src="script.js"></script>

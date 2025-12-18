@@ -6,7 +6,7 @@ const app = Vue.createApp({
       selectedPlayerId: "",
       selectedGoalieId: "",
       difficulty: "medium",
-      goalieX: 50,
+      goalieX: 50, // percentage position of goalie
       puckX: 50,
       puckY: 45,
       puckVisible: false,
@@ -57,91 +57,89 @@ const app = Vue.createApp({
     },
 
     shoot(e) {
-  if (!this.selectedPlayer || !this.selectedGoalie) {
-    this.message = "SELECT PLAYER & GOALIE";
-    return;
-  }
-
-  this.shots++;
-  this.puckVisible = true;
-
-  const rink = e.currentTarget.getBoundingClientRect();
-  const clickX = e.clientX - rink.left;
-  const clickY = e.clientY - rink.top;
-
-  this.puckX = (clickX / rink.width) * 100;
-  this.puckY = rink.height - clickY;
-
-  new Audio("sounds/shoot.mp3").play();
-
-  setTimeout(() => {
-    const goalImg = document.querySelector(".goal");
-    const goalieImg = document.querySelector(".goalie");
-
-    const goalBox = goalImg.getBoundingClientRect();
-    const goalieBox = goalieImg.getBoundingClientRect();
-
-    const x = e.clientX;
-    const y = e.clientY;
-
-    // Define the precise goalie area (only middle part of the image)
-    const goalieActiveLeft = goalieBox.left + goalieBox.width * 0.15;
-    const goalieActiveRight = goalieBox.right - goalieBox.width * 0.15;
-    const goalieActiveTop = goalieBox.top + goalieBox.height * 0.1;
-    const goalieActiveBottom = goalieBox.bottom - goalieBox.height * 0.05;
-
-    const hitsGoalie =
-      x >= goalieActiveLeft &&
-      x <= goalieActiveRight &&
-      y >= goalieActiveTop &&
-      y <= goalieActiveBottom;
-
-    // Define goal area (inside the goal posts)
-    const goalActiveLeft = goalBox.left + goalBox.width * 0.05;
-    const goalActiveRight = goalBox.right - goalBox.width * 0.05;
-    const goalActiveTop = goalBox.top + goalBox.height * 0.05;
-    const goalActiveBottom = goalBox.bottom;
-
-    const hitsGoal =
-      x >= goalActiveLeft &&
-      x <= goalActiveRight &&
-      y >= goalActiveTop &&
-      y <= goalActiveBottom &&
-      !hitsGoalie;
-
-    if (hitsGoalie) {
-      new Audio("sounds/save.mp3").play();
-      this.message = "SAVE!";
-    } else if (hitsGoal) {
-      new Audio("sounds/goal.mp3").play();
-      this.goals++;
-
-      // Top corner bonus: upper 25% and outer 25% of goal image
-      const leftCorner = goalActiveLeft + 0.25 * (goalActiveRight - goalActiveLeft);
-      const rightCorner = goalActiveRight - 0.25 * (goalActiveRight - goalActiveLeft);
-      const topLine = goalActiveTop + 0.25 * (goalActiveBottom - goalActiveTop);
-
-      if ((x <= leftCorner || x >= rightCorner) && y <= topLine) {
-        this.bonus++;
-        this.message = "TOP CORNER!";
-      } else {
-        this.message = "GOAL!";
+      if (!this.selectedPlayer || !this.selectedGoalie) {
+        this.message = "SELECT PLAYER & GOALIE";
+        return;
       }
-    } else {
-      this.message = "MISS!";
+
+      this.shots++;
+      this.puckVisible = true;
+
+      const rink = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rink.left;
+      const clickY = e.clientY - rink.top;
+
+      this.puckX = (clickX / rink.width) * 100;
+      this.puckY = rink.height - clickY;
+
+      new Audio("sounds/shoot.mp3").play();
+
+      setTimeout(() => {
+        // Define the actual visible net coordinates inside rink
+        const goalTop = rink.height * 0.15; // top edge of net
+        const goalBottom = rink.height * 0.50; // bottom edge of net
+        const goalLeft = rink.width * 0.30; // left edge of net
+        const goalRight = rink.width * 0.70; // right edge of net
+
+        // Goalie box relative to goal, using goalieX position
+        const goalieImg = document.querySelector(".goalie");
+        const goalieWidth = goalieImg.offsetWidth;
+        const goalieHeight = goalieImg.offsetHeight;
+
+        const goalieLeft = rink.left + (this.goalieX / 100) * rink.width - goalieWidth / 2;
+        const goalieRight = goalieLeft + goalieWidth;
+        const goalieTop = rink.top + goalTop;
+        const goalieBottom = goalieTop + goalieHeight;
+
+        const puckXPos = e.clientX;
+        const puckYPos = e.clientY;
+
+        // Check goalie save
+        const hitsGoalie =
+          puckXPos >= goalieLeft &&
+          puckXPos <= goalieRight &&
+          puckYPos >= goalieTop &&
+          puckYPos <= goalieBottom;
+
+        // Check goal
+        const hitsGoal =
+          puckXPos >= rink.left + goalLeft &&
+          puckXPos <= rink.left + goalRight &&
+          puckYPos >= rink.top + goalTop &&
+          puckYPos <= rink.top + goalBottom &&
+          !hitsGoalie;
+
+        if (hitsGoalie) {
+          new Audio("sounds/save.mp3").play();
+          this.message = "SAVE!";
+        } else if (hitsGoal) {
+          new Audio("sounds/goal.mp3").play();
+          this.goals++;
+
+          // Top corner bonus
+          const topLine = rink.top + goalTop + 0.25 * (goalBottom - goalTop);
+          const leftCorner = rink.left + goalLeft + 0.25 * (goalRight - goalLeft);
+          const rightCorner = rink.left + goalRight - 0.25 * (goalRight - goalLeft);
+
+          if ((puckXPos <= leftCorner || puckXPos >= rightCorner) && puckYPos <= topLine) {
+            this.bonus++;
+            this.message = "TOP CORNER!";
+          } else {
+            this.message = "GOAL!";
+          }
+        } else {
+          this.message = "MISS!";
+        }
+
+        if (this.goals > this.bestScore) {
+          this.bestScore = this.goals;
+          localStorage.setItem("bestScore", this.bestScore);
+        }
+
+        this.puckVisible = false;
+        this.puckY = 45;
+      }, 450);
     }
-
-    if (this.goals > this.bestScore) {
-      this.bestScore = this.goals;
-      localStorage.setItem("bestScore", this.bestScore);
-    }
-
-    this.puckVisible = false;
-    this.puckY = 45;
-  }, 450);
-}
-
-
   },
   mounted() {
     fetch("players.json").then(r => r.json()).then(d => this.players = d);

@@ -2,5 +2,9 @@
   {"id":1,"name":"Andrei Vasilevskiy","reaction":0.9,"reach":22,"image":"imgs/vassy.png"},
   {"id":2,"name":"Igor Shesterkin","reaction":0.95,"reach":18,"image":"imgs/igor.png"},
   {"id":3,"name":"Connor Hellebuyck","reaction":0.88,"reach":24,"image":"imgs/helly.png"},
-  {"id":4,"name":"Juuse Saros","reaction":0.92,"reach":17,"image":"imgs/saros.png"}
+  {"id":4,"name":"Juuse Saros","reaction":0.92,"reach":17,"image":"imgs/saros.png"},
+  {"id":5,"name":"Jordan Binnington","reaction":0.87,"reach":20,"image":"imgs/binnington.png"},
+  {"id":6,"name":"sergei Bobrovsky","reaction":0.86,"reach":19,"image":"imgs/bob.png"},
+  {"id":7,"name":"Thatcher Demko","reaction":0.89,"reach":21,"image":"imgs/demko.png"},
+  {"id":9,"name":"Ilya Sorokin","reaction":0.91,"reach":18,"image":"imgs/sorokin.png"}
 ]
