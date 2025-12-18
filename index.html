@@ -17,7 +17,7 @@
   <p>Select your player and goalie, then shoot</p>
 </header>
 
-<main id="app" class="main-container">
+<main id="app" class="container my-4">
 
   <!-- Player & Goalie Selection -->
   <div class="row mb-3 text-center">
@@ -27,7 +27,6 @@
         <option disabled value="">Select Shooter</option>
         <option v-for="p in players" :value="p.id">{{ p.name }}</option>
       </select>
-      <img v-if="selectedPlayer" :src="selectedPlayer.image" class="selection-img">
     </div>
 
     <div class="col-md-6">
@@ -36,7 +35,6 @@
         <option disabled value="">Select Goalie</option>
         <option v-for="g in goalies" :value="g.id">{{ g.name }}</option>
       </select>
-      <img v-if="selectedGoalie" :src="selectedGoalie.image" class="selection-img">
     </div>
   </div>
 
@@ -50,13 +48,12 @@
     </select>
   </div>
 
-  <!-- Rink + Scoreboard -->
-  <div class="game-wrapper">
-
+  <!-- Game Area + Scoreboard -->
+  <div class="d-flex align-start gap-3">
+    
     <!-- Rink Section -->
-    <section class="rink" @click="shoot">
+    <section class="rink flex-shrink-0" @click="shoot">
       <img src="imgs/rink.webp" class="rink-bg">
-      <img v-if="selectedPlayer" :src="selectedPlayer.image" class="player">
       <div class="goal-wrapper">
         <img src="imgs/goal.png" class="goal">
         <img v-if="selectedGoalie" :src="selectedGoalie.image" class="goalie" :style="goalieStyle">
@@ -66,6 +63,8 @@
 
     <!-- Scoreboard Section -->
     <div class="scoreboard">
+      
+      <!-- Top: Player & Goalie Images -->
       <div class="score-header">
         <div class="player-info">
           <div>PLAYER</div>
@@ -77,6 +76,7 @@
         </div>
       </div>
 
+      <!-- Scores -->
       <div class="score-body">
         <div class="score-item">SHOTS<span>{{ shots }}</span></div>
         <div class="score-item">GOALS<span>{{ goals }}</span></div>
@@ -84,8 +84,8 @@
         <div class="score-item">BEST<span>{{ bestScore }}</span></div>
         <div class="score-message" v-if="message">{{ message }}</div>
       </div>
-    </div>
 
+    </div>
   </div>
 
 </main>
