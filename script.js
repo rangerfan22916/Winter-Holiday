@@ -59,7 +59,7 @@ const app = Vue.createApp({
       this.shots++;
       this.puckVisible = true;
 
-      // Play shot sound immediately (start at 6s, end at 7s)
+      // Play shot sound immediately (from 6s to 7s)
       this.shootAudio.currentTime = 6;
       this.shootAudio.play();
       setTimeout(() => this.shootAudio.pause(), 1000);
@@ -73,42 +73,41 @@ const app = Vue.createApp({
 
       setTimeout(() => {
         const goalRect = document.querySelector(".goal-wrapper").getBoundingClientRect();
-        const goalieRect = document.querySelector(".goalie").getBoundingClientRect();
 
+        // Normalized goalie hitbox (same size for all goalies)
+        const goalWidth = goalRect.right - goalRect.left;
+        const goalHeight = goalRect.bottom - goalRect.top;
+
+        const goalieWidth = goalWidth * 0.25; // goalie covers 25% of goal width
+        const goalieHeight = goalHeight * 0.9; // goalie height nearly full net
+        const goalieCenterX = goalRect.left + (goalWidth * this.goalieX / 100);
+
+        const goalieLeft = goalieCenterX - goalieWidth / 2;
+        const goalieRight = goalieCenterX + goalieWidth / 2;
+        const goalieTop = goalRect.bottom - goalieHeight;
+        const goalieBottom = goalRect.bottom;
+
+        // Puck position
         const puckX = e.clientX;
         const puckY = e.clientY;
 
-        // Goal boundaries
-        const goalLeft = goalRect.left;
-        const goalRight = goalRect.right;
-        const goalTop = goalRect.top;
-        const goalBottom = goalRect.bottom;
-
-        // Goalie boundaries
-        const goalieLeft = goalieRect.left;
-        const goalieRight = goalieRect.right;
-        const goalieTop = goalieRect.top;
-        const goalieBottom = goalieRect.bottom;
-
-        // Check if puck is inside goal
-        const inGoalArea = puckX >= goalLeft && puckX <= goalRight && puckY >= goalTop && puckY <= goalBottom;
-
-        // Check if puck hits goalie inside goal vertical bounds
-        const hitsGoalie = puckX >= goalieLeft && puckX <= goalieRight && puckY >= goalieTop && puckY <= goalieBottom && puckY >= goalTop && puckY <= goalBottom;
+        // Check if puck is in goal area
+        const inGoal = puckX >= goalRect.left && puckX <= goalRect.right && puckY >= goalRect.top && puckY <= goalRect.bottom;
+        // Check if hits goalie
+        const hitsGoalie = inGoal && puckX >= goalieLeft && puckX <= goalieRight && puckY >= goalieTop && puckY <= goalieBottom;
 
         if (hitsGoalie) {
           this.message = "SAVE!";
           this.awwAudio.currentTime = 0.3;
           this.awwAudio.play();
-        } else if (inGoalArea) {
+        } 
+        else if (inGoal) {
           this.goals++;
 
-          // Top corner bonus
-          const goalWidth = goalRight - goalLeft;
-          const goalHeight = goalBottom - goalTop;
-          const topLine = goalTop + goalHeight * 0.25;
-          const leftCorner = goalLeft + goalWidth * 0.2;
-          const rightCorner = goalRight - goalWidth * 0.2;
+          // Top corner detection
+          const topLine = goalRect.top + goalHeight * 0.25;
+          const leftCorner = goalRect.left + goalWidth * 0.2;
+          const rightCorner = goalRect.right - goalWidth * 0.2;
 
           if (puckY <= topLine && (puckX <= leftCorner || puckX >= rightCorner)) {
             this.bonus++;
@@ -117,7 +116,7 @@ const app = Vue.createApp({
             this.message = "GOAL!";
           }
 
-          // Play goal horn starting at 2s, stop after 2s
+          // Play goal horn from 2s for 2s
           this.goalAudio.currentTime = 2;
           this.goalAudio.play();
           setTimeout(() => this.goalAudio.pause(), 2000);
@@ -135,7 +134,7 @@ const app = Vue.createApp({
 
         this.puckVisible = false;
         this.puckY = 45;
-      }, 50); // shorter timeout for immediate hit detection
+      }, 50);
     }
   },
 
