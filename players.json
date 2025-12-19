@@ -3,8 +3,8 @@
   {"id":2,"name":"Auston Matthews","accuracy":0.88,"image":"imgs/matthews.png"},
   {"id":3,"name":"Sidney Crosby","accuracy":0.85,"image":"imgs/crosby.png"},
   {"id":4,"name":"Alex Ovechkin","accuracy":0.90,"image":"imgs/ovechkin.png"},
-  {"id":5,"name":"Leon Draisaitl","accuracy":0.87,"image":"imgs/draisaitl.png"},
-  {"id":6,"name":"Nathan MacKinnon","accuracy":0.86,"image":"imgs/mackinnon.png"},
+  {"id":5,"name":"Leon Draisaitl","accuracy":0.87,"image":"imgs/draisitil.png"},
+  {"id":6,"name":"Nathan MacKinnon","accuracy":0.86,"image":"imgs/mckinnon.png"},
   {"id":7,"name":"Cale Makar","accuracy":0.83,"image":"imgs/makar.png"},
   {"id":8,"name":"Kirill Kaprizov","accuracy":0.84,"image":"imgs/kaprizov.png"},
   {"id":9,"name":"David Pastrnak","accuracy":0.85,"image":"imgs/pastrnak.png"}
