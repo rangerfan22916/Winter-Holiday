@@ -28,6 +28,10 @@
         <option disabled value="">Select Shooter</option>
         <option v-for="p in players" :value="p.id">{{ p.name }}</option>
       </select>
+      <div class="mt-2 button-group">
+        <button class="switch-btn current-btn" @click="loadCurrentPlayers">Current Players</button>
+        <button class="switch-btn old-btn" @click="loadOldPlayers">Old Players</button>
+      </div>
     </div>
     <div class="col-md-6">
       <label class="form-label h5">Goalie</label>
@@ -35,6 +39,10 @@
         <option disabled value="">Select Goalie</option>
         <option v-for="g in goalies" :value="g.id">{{ g.name }}</option>
       </select>
+      <div class="mt-2 button-group">
+        <button class="switch-btn current-btn" @click="loadCurrentGoalies">Current Goalies</button>
+        <button class="switch-btn old-btn" @click="loadOldGoalies">Old Goalies</button>
+      </div>
     </div>
   </div>
 

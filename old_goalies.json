@@ -1,0 +1,9 @@
+[
+  {"id":201,"name":"Patrick Roy","reaction":0.92,"reach":25,"image":"imgs/roy.png"},
+  {"id":202,"name":"Dominik Hasek","reaction":0.95,"reach":24,"image":"imgs/hasek.png"},
+  {"id":203,"name":"Ken Dryden","reaction":0.90,"reach":23,"image":"imgs/dryden.png"},
+  {"id":207,"name":"Ed Belfour","reaction":0.91,"reach":24,"image":"imgs/belfour.png"},
+  {"id":209,"name":"Henrik Lundqvist","reaction":0.93,"reach":24,"image":"imgs/lundqvist.png"},
+  {"id":210,"name":"Mike Richter","reaction":0.91,"reach":23,"image":"imgs/richter.png"},
+   {"id":211,"name":"Marty Brodeur","reaction":0.99,"reach":26,"image":"imgs/brodeur.png"}
+]

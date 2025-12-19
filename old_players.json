@@ -1,0 +1,7 @@
+[
+  {"id":101,"name":"Wayne Gretzky","accuracy":0.96,"image":"imgs/gretzky.png"},
+  {"id":102,"name":"Mario Lemieux","accuracy":0.94,"image":"imgs/lemieux.png"},
+  {"id":103,"name":"Bobby Orr","accuracy":0.92,"image":"imgs/orr.png"},
+  {"id":104,"name":"Mark Messier","accuracy":0.90,"image":"imgs/messier.png"},
+  {"id":106,"name":"Jaromir Jagr","accuracy":0.89,"image":"imgs/jagr.png"}
+]

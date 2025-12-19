@@ -1,8 +1,14 @@
 const app = Vue.createApp({
   data() {
     return {
+      // All players/goalies
+      currentPlayers: [],
+      oldPlayers: [],
+      currentGoalies: [],
+      oldGoalies: [],
       players: [],
       goalies: [],
+      
       selectedPlayerId: "",
       selectedGoalieId: "",
       difficulty: "medium",
@@ -19,7 +25,7 @@ const app = Vue.createApp({
       bestScore: Number(localStorage.getItem("bestScore")) || 0,
       goalieTimer: null,
 
-      // Audio elements
+      // Audio
       goalAudio: new Audio("sounds/goal_horn.mp3"),
       awwAudio: new Audio("sounds/aww.mp3"),
       shootAudio: new Audio("sounds/shot.mp3")
@@ -36,7 +42,6 @@ const app = Vue.createApp({
   methods: {
     moveGoalie() {
       if (!this.selectedGoalie) return;
-
       let range, speed;
       if (this.difficulty === "easy") { range = 10; speed = 1200; }
       else if (this.difficulty === "medium") { range = 16; speed = 800; }
@@ -74,12 +79,12 @@ const app = Vue.createApp({
       setTimeout(() => {
         const goalRect = document.querySelector(".goal-wrapper").getBoundingClientRect();
 
-        // Normalized goalie hitbox (same size for all goalies)
+        // Uniform goalie hitbox
         const goalWidth = goalRect.right - goalRect.left;
         const goalHeight = goalRect.bottom - goalRect.top;
 
-        const goalieWidth = goalWidth * 0.25; // goalie covers 25% of goal width
-        const goalieHeight = goalHeight * 0.9; // goalie height nearly full net
+        const goalieWidth = goalWidth * 0.25; // covers 25% of goal
+        const goalieHeight = goalHeight * 0.9; // nearly full height
         const goalieCenterX = goalRect.left + (goalWidth * this.goalieX / 100);
 
         const goalieLeft = goalieCenterX - goalieWidth / 2;
@@ -87,13 +92,10 @@ const app = Vue.createApp({
         const goalieTop = goalRect.bottom - goalieHeight;
         const goalieBottom = goalRect.bottom;
 
-        // Puck position
         const puckX = e.clientX;
         const puckY = e.clientY;
 
-        // Check if puck is in goal area
         const inGoal = puckX >= goalRect.left && puckX <= goalRect.right && puckY >= goalRect.top && puckY <= goalRect.bottom;
-        // Check if hits goalie
         const hitsGoalie = inGoal && puckX >= goalieLeft && puckX <= goalieRight && puckY >= goalieTop && puckY <= goalieBottom;
 
         if (hitsGoalie) {
@@ -104,7 +106,7 @@ const app = Vue.createApp({
         else if (inGoal) {
           this.goals++;
 
-          // Top corner detection
+          // Top corner bonus
           const topLine = goalRect.top + goalHeight * 0.25;
           const leftCorner = goalRect.left + goalWidth * 0.2;
           const rightCorner = goalRect.right - goalWidth * 0.2;
@@ -116,11 +118,10 @@ const app = Vue.createApp({
             this.message = "GOAL!";
           }
 
-          // Play goal horn from 2s for 2s
+          // Goal horn from 2s for 2s
           this.goalAudio.currentTime = 2;
           this.goalAudio.play();
           setTimeout(() => this.goalAudio.pause(), 2000);
-
         } else {
           this.message = "MISS!";
           this.awwAudio.currentTime = 0.3;
@@ -135,12 +136,22 @@ const app = Vue.createApp({
         this.puckVisible = false;
         this.puckY = 45;
       }, 50);
-    }
+    },
+
+    // Switch buttons
+    loadCurrentPlayers() { this.players = this.currentPlayers; this.selectedPlayerId = ""; },
+    loadOldPlayers() { this.players = this.oldPlayers; this.selectedPlayerId = ""; },
+    loadCurrentGoalies() { this.goalies = this.currentGoalies; this.selectedGoalieId = ""; this.moveGoalie(); },
+    loadOldGoalies() { this.goalies = this.oldGoalies; this.selectedGoalieId = ""; this.moveGoalie(); }
   },
 
   mounted() {
-    fetch("players.json").then(r => r.json()).then(d => this.players = d);
-    fetch("goalies.json").then(r => r.json()).then(d => this.goalies = d);
+    // Load JSONs
+    fetch("players.json").then(r=>r.json()).then(d=> { this.currentPlayers = d; this.players = d; });
+    fetch("old_players.json").then(r=>r.json()).then(d=> this.oldPlayers = d);
+
+    fetch("goalies.json").then(r=>r.json()).then(d=> { this.currentGoalies = d; this.goalies = d; });
+    fetch("old_goalies.json").then(r=>r.json()).then(d=> this.oldGoalies = d);
 
     this.moveGoalie();
 
@@ -164,20 +175,17 @@ const app = Vue.createApp({
       ctx.beginPath();
       flakes.forEach(f => {
         ctx.moveTo(f.x, f.y);
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
       });
       ctx.fill();
 
       angle += 0.01;
       flakes.forEach(f => {
-        f.y += Math.cos(angle + f.d) + 1 + f.r / 2;
-        f.x += Math.sin(angle) * 2;
-        if (f.y > canvas.height) {
-          f.y = 0;
-          f.x = Math.random() * canvas.width;
-        }
+        f.y += Math.cos(angle + f.d) + 1 + f.r/2;
+        f.x += Math.sin(angle)*2;
+        if(f.y > canvas.height){ f.y=0; f.x=Math.random()*canvas.width; }
       });
-    }, 33);
+    },33);
   },
 
   watch: {
