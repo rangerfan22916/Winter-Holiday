@@ -1,8 +1,8 @@
 [
-  {"id":1,"name":"Connor McDavid","accuracy":0.85,"image":"imgs/mcdavid.png"},
+  {"id":1,"name":"Connor McDavid","accuracy":0.95,"image":"imgs/mcdavid.png"},
   {"id":2,"name":"Auston Matthews","accuracy":0.88,"image":"imgs/matthews.png"},
-  {"id":3,"name":"Sidney Crosby","accuracy":0.82,"image":"imgs/crosby.png"},
-  {"id":4,"name":"Alex Ovechkin","accuracy":0.9,"image":"imgs/ovechkin.png"},
+  {"id":3,"name":"Sidney Crosby","accuracy":0.85,"image":"imgs/crosby.png"},
+  {"id":4,"name":"Alex Ovechkin","accuracy":0.90,"image":"imgs/ovechkin.png"},
   {"id":5,"name":"Leon Draisaitl","accuracy":0.87,"image":"imgs/draisaitl.png"},
   {"id":6,"name":"Nathan MacKinnon","accuracy":0.86,"image":"imgs/mackinnon.png"},
   {"id":7,"name":"Cale Makar","accuracy":0.83,"image":"imgs/makar.png"},
