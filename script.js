@@ -7,6 +7,9 @@ const app = Vue.createApp({
       selectedGoalieId: "",
       difficulty: "medium",
 
+      // ERA MODE
+      era: "current",
+
       goalieX: 50,
       puckX: 50,
       puckY: 45,
@@ -46,6 +49,38 @@ const app = Vue.createApp({
   },
 
   methods: {
+    /* ================= ERA SWITCH ================= */
+
+    loadCurrent() {
+      this.era = "current";
+      this.selectedPlayerId = "";
+      this.selectedGoalieId = "";
+
+      fetch("players_current.json")
+        .then(r => r.json())
+        .then(d => this.players = d);
+
+      fetch("goalies_current.json")
+        .then(r => r.json())
+        .then(d => this.goalies = d);
+    },
+
+    loadOld() {
+      this.era = "old";
+      this.selectedPlayerId = "";
+      this.selectedGoalieId = "";
+
+      fetch("old_players.json")
+        .then(r => r.json())
+        .then(d => this.players = d);
+
+      fetch("old_goalies.json")
+        .then(r => r.json())
+        .then(d => this.goalies = d);
+    },
+
+    /* ================= GOALIE MOVEMENT ================= */
+
     moveGoalie() {
       if (!this.selectedGoalie) return;
 
@@ -61,6 +96,8 @@ const app = Vue.createApp({
         this.goalieX = 50 + (Math.random() * range * 2 - range);
       }, speed);
     },
+
+    /* ================= SHOOT ================= */
 
     shoot(e) {
       if (!this.selectedPlayer || !this.selectedGoalie) {
@@ -94,7 +131,7 @@ const app = Vue.createApp({
         const goalWidth = goalRight - goalLeft;
         const goalHeight = goalBottom - goalTop;
 
-        // NORMALIZED GOALIE HITBOX
+        // NORMALIZED GOALIE HITBOX (ERA SAFE)
         const goalieWidth = goalWidth * 0.25;
         const goalieHeight = goalHeight * 0.9;
         const goalieCenterX = goalLeft + (goalWidth * this.goalieX / 100);
@@ -120,36 +157,28 @@ const app = Vue.createApp({
           puckY >= goalieTop &&
           puckY <= goalieBottom;
 
-        // POST ZONE
+        // POST
         const postThickness = goalWidth * 0.03;
-        const hitsLeftPost =
-          puckX >= goalLeft &&
-          puckX <= goalLeft + postThickness &&
-          puckY >= goalTop &&
-          puckY <= goalBottom;
-
-        const hitsRightPost =
-          puckX <= goalRight &&
-          puckX >= goalRight - postThickness &&
+        const hitsPost =
+          ((puckX >= goalLeft && puckX <= goalLeft + postThickness) ||
+           (puckX <= goalRight && puckX >= goalRight - postThickness)) &&
           puckY >= goalTop &&
           puckY <= goalBottom;
 
         // TOP CORNER
-        const topLine = goalTop + goalHeight * 0.25;
-        const leftCorner = goalLeft + goalWidth * 0.2;
-        const rightCorner = goalRight - goalWidth * 0.2;
-
         const isTopCorner =
-          puckY <= topLine &&
-          (puckX <= leftCorner || puckX >= rightCorner);
+          puckY <= goalTop + goalHeight * 0.25 &&
+          (puckX <= goalLeft + goalWidth * 0.2 ||
+           puckX >= goalRight - goalWidth * 0.2);
 
-        // ===== RESULT LOGIC =====
+        /* ===== RESULT ===== */
+
         if (hitsGoalie) {
           this.message = "SAVE!";
           this.awwAudio.currentTime = 0.3;
           this.awwAudio.play();
 
-        } else if (hitsLeftPost || hitsRightPost) {
+        } else if (hitsPost) {
           this.message = "POST!";
           this.postAudio.currentTime = 0;
           this.postAudio.play();
@@ -160,7 +189,6 @@ const app = Vue.createApp({
           if (isTopCorner) {
             this.bonus++;
             this.message = "TOP CORNER!";
-
             this.postAudio.currentTime = 0;
             this.postAudio.play();
 
@@ -196,9 +224,7 @@ const app = Vue.createApp({
   },
 
   mounted() {
-    fetch("players.json").then(r => r.json()).then(d => this.players = d);
-    fetch("goalies.json").then(r => r.json()).then(d => this.goalies = d);
-    this.moveGoalie();
+    this.loadCurrent(); // DEFAULT ERA
   },
 
   watch: {
