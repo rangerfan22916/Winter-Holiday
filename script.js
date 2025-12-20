@@ -1,14 +1,8 @@
 const app = Vue.createApp({
   data() {
     return {
-      // All players/goalies
-      currentPlayers: [],
-      oldPlayers: [],
-      currentGoalies: [],
-      oldGoalies: [],
       players: [],
       goalies: [],
-      
       selectedPlayerId: "",
       selectedGoalieId: "",
       difficulty: "medium",
@@ -25,23 +19,36 @@ const app = Vue.createApp({
       bestScore: Number(localStorage.getItem("bestScore")) || 0,
       goalieTimer: null,
 
-      // Audio
+      // AUDIO
+      shootAudio: new Audio("sounds/shot.mp3"),
       goalAudio: new Audio("sounds/goal_horn.mp3"),
       awwAudio: new Audio("sounds/aww.mp3"),
-      shootAudio: new Audio("sounds/shot.mp3")
+      postAudio: new Audio("sounds/ding.mp3")
     };
   },
 
   computed: {
-    selectedPlayer() { return this.players.find(p => p.id == this.selectedPlayerId); },
-    selectedGoalie() { return this.goalies.find(g => g.id == this.selectedGoalieId); },
-    goalieStyle() { return { left: this.goalieX + "%" }; },
-    puckStyle() { return { left: this.puckX + "%", bottom: this.puckY + "px" }; }
+    selectedPlayer() {
+      return this.players.find(p => p.id == this.selectedPlayerId);
+    },
+    selectedGoalie() {
+      return this.goalies.find(g => g.id == this.selectedGoalieId);
+    },
+    goalieStyle() {
+      return { left: this.goalieX + "%" };
+    },
+    puckStyle() {
+      return {
+        left: this.puckX + "%",
+        bottom: this.puckY + "px"
+      };
+    }
   },
 
   methods: {
     moveGoalie() {
       if (!this.selectedGoalie) return;
+
       let range, speed;
       if (this.difficulty === "easy") { range = 10; speed = 1200; }
       else if (this.difficulty === "medium") { range = 16; speed = 800; }
@@ -64,7 +71,7 @@ const app = Vue.createApp({
       this.shots++;
       this.puckVisible = true;
 
-      // Play shot sound immediately (from 6s to 7s)
+      // SHOT SOUND (6s → 7s)
       this.shootAudio.currentTime = 6;
       this.shootAudio.play();
       setTimeout(() => this.shootAudio.pause(), 1000);
@@ -79,49 +86,97 @@ const app = Vue.createApp({
       setTimeout(() => {
         const goalRect = document.querySelector(".goal-wrapper").getBoundingClientRect();
 
-        // Uniform goalie hitbox
-        const goalWidth = goalRect.right - goalRect.left;
-        const goalHeight = goalRect.bottom - goalRect.top;
+        const goalLeft = goalRect.left;
+        const goalRight = goalRect.right;
+        const goalTop = goalRect.top;
+        const goalBottom = goalRect.bottom;
 
-        const goalieWidth = goalWidth * 0.25; // covers 25% of goal
-        const goalieHeight = goalHeight * 0.9; // nearly full height
-        const goalieCenterX = goalRect.left + (goalWidth * this.goalieX / 100);
+        const goalWidth = goalRight - goalLeft;
+        const goalHeight = goalBottom - goalTop;
+
+        // NORMALIZED GOALIE HITBOX
+        const goalieWidth = goalWidth * 0.25;
+        const goalieHeight = goalHeight * 0.9;
+        const goalieCenterX = goalLeft + (goalWidth * this.goalieX / 100);
 
         const goalieLeft = goalieCenterX - goalieWidth / 2;
         const goalieRight = goalieCenterX + goalieWidth / 2;
-        const goalieTop = goalRect.bottom - goalieHeight;
-        const goalieBottom = goalRect.bottom;
+        const goalieTop = goalBottom - goalieHeight;
+        const goalieBottom = goalBottom;
 
         const puckX = e.clientX;
         const puckY = e.clientY;
 
-        const inGoal = puckX >= goalRect.left && puckX <= goalRect.right && puckY >= goalRect.top && puckY <= goalRect.bottom;
-        const hitsGoalie = inGoal && puckX >= goalieLeft && puckX <= goalieRight && puckY >= goalieTop && puckY <= goalieBottom;
+        const inGoal =
+          puckX >= goalLeft &&
+          puckX <= goalRight &&
+          puckY >= goalTop &&
+          puckY <= goalBottom;
 
+        const hitsGoalie =
+          inGoal &&
+          puckX >= goalieLeft &&
+          puckX <= goalieRight &&
+          puckY >= goalieTop &&
+          puckY <= goalieBottom;
+
+        // POST ZONE
+        const postThickness = goalWidth * 0.03;
+        const hitsLeftPost =
+          puckX >= goalLeft &&
+          puckX <= goalLeft + postThickness &&
+          puckY >= goalTop &&
+          puckY <= goalBottom;
+
+        const hitsRightPost =
+          puckX <= goalRight &&
+          puckX >= goalRight - postThickness &&
+          puckY >= goalTop &&
+          puckY <= goalBottom;
+
+        // TOP CORNER
+        const topLine = goalTop + goalHeight * 0.25;
+        const leftCorner = goalLeft + goalWidth * 0.2;
+        const rightCorner = goalRight - goalWidth * 0.2;
+
+        const isTopCorner =
+          puckY <= topLine &&
+          (puckX <= leftCorner || puckX >= rightCorner);
+
+        // ===== RESULT LOGIC =====
         if (hitsGoalie) {
           this.message = "SAVE!";
           this.awwAudio.currentTime = 0.3;
           this.awwAudio.play();
-        } 
-        else if (inGoal) {
+
+        } else if (hitsLeftPost || hitsRightPost) {
+          this.message = "POST!";
+          this.postAudio.currentTime = 0;
+          this.postAudio.play();
+
+        } else if (inGoal) {
           this.goals++;
 
-          // Top corner bonus
-          const topLine = goalRect.top + goalHeight * 0.25;
-          const leftCorner = goalRect.left + goalWidth * 0.2;
-          const rightCorner = goalRect.right - goalWidth * 0.2;
-
-          if (puckY <= topLine && (puckX <= leftCorner || puckX >= rightCorner)) {
+          if (isTopCorner) {
             this.bonus++;
             this.message = "TOP CORNER!";
+
+            this.postAudio.currentTime = 0;
+            this.postAudio.play();
+
+            setTimeout(() => {
+              this.goalAudio.currentTime = 2;
+              this.goalAudio.play();
+              setTimeout(() => this.goalAudio.pause(), 2000);
+            }, 150);
+
           } else {
             this.message = "GOAL!";
+            this.goalAudio.currentTime = 2;
+            this.goalAudio.play();
+            setTimeout(() => this.goalAudio.pause(), 2000);
           }
 
-          // Goal horn from 2s for 2s
-          this.goalAudio.currentTime = 2;
-          this.goalAudio.play();
-          setTimeout(() => this.goalAudio.pause(), 2000);
         } else {
           this.message = "MISS!";
           this.awwAudio.currentTime = 0.3;
@@ -135,57 +190,15 @@ const app = Vue.createApp({
 
         this.puckVisible = false;
         this.puckY = 45;
-      }, 50);
-    },
 
-    // Switch buttons
-    loadCurrentPlayers() { this.players = this.currentPlayers; this.selectedPlayerId = ""; },
-    loadOldPlayers() { this.players = this.oldPlayers; this.selectedPlayerId = ""; },
-    loadCurrentGoalies() { this.goalies = this.currentGoalies; this.selectedGoalieId = ""; this.moveGoalie(); },
-    loadOldGoalies() { this.goalies = this.oldGoalies; this.selectedGoalieId = ""; this.moveGoalie(); }
+      }, 50);
+    }
   },
 
   mounted() {
-    // Load JSONs
-    fetch("players.json").then(r=>r.json()).then(d=> { this.currentPlayers = d; this.players = d; });
-    fetch("old_players.json").then(r=>r.json()).then(d=> this.oldPlayers = d);
-
-    fetch("goalies.json").then(r=>r.json()).then(d=> { this.currentGoalies = d; this.goalies = d; });
-    fetch("old_goalies.json").then(r=>r.json()).then(d=> this.oldGoalies = d);
-
+    fetch("players.json").then(r => r.json()).then(d => this.players = d);
+    fetch("goalies.json").then(r => r.json()).then(d => this.goalies = d);
     this.moveGoalie();
-
-    // ❄️ Snow effect
-    const canvas = document.getElementById("snow");
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const flakes = Array.from({ length: 120 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 3 + 1,
-      d: Math.random()
-    }));
-
-    let angle = 0;
-    setInterval(() => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      flakes.forEach(f => {
-        ctx.moveTo(f.x, f.y);
-        ctx.arc(f.x, f.y, f.r, 0, Math.PI*2);
-      });
-      ctx.fill();
-
-      angle += 0.01;
-      flakes.forEach(f => {
-        f.y += Math.cos(angle + f.d) + 1 + f.r/2;
-        f.x += Math.sin(angle)*2;
-        if(f.y > canvas.height){ f.y=0; f.x=Math.random()*canvas.width; }
-      });
-    },33);
   },
 
   watch: {
